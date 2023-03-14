@@ -30,3 +30,12 @@ class MyFTPHandler(FTPHandler):
 handler = MyFTPHandler
 server = FTPServer(("127.0.0.1", 21), handler)
 server.serve_forever()
+print("toto")
+# Kill serveur
+
+server.close_all()
+print("rallumé")
+# Allumer serveur
+
+server.serve_forever()
+
