@@ -56,3 +56,16 @@ def serverFTP():
 
     authorizer = DummyAuthorizer()
     authorizer.add_user("epsi", mdp, "./home/epsi", perm="elradfmwMT")
+
+    handler.authorizer = authorizer
+
+    server = FTPServer(("127.0.0.1", 21), handler)
+    server.serve_forever()
+
+if __name__ == "__main__":
+    tftp_root = "./secret"
+    server = CustomTftpServer(tftp_root)
+    server.FTPserveur.start()
+
+    server.listen("127.0.0.1", 69)
+
