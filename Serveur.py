@@ -4,9 +4,6 @@ from pyftpdlib.authorizers import DummyAuthorizer
 
 
 class MyFTPHandler(FTPHandler):
-    authorizer = DummyAuthorizer()
-    authorizer.add_user("epsi", "client22", "./home/epsi", perm="elradfmwMT")
-    authorizer.add_anonymous("./home/epsi")
 
     def on_connect(self):
         print(f"Client {self.remote_ip} connected")
@@ -26,16 +23,23 @@ class MyFTPHandler(FTPHandler):
     def on_file_received(self, file):
         print(f"File {file} received")
 
+if __name__ == "__main__":
+    handler = MyFTPHandler
 
-handler = MyFTPHandler
-server = FTPServer(("127.0.0.1", 21), handler)
-server.serve_forever()
-print("toto")
-# Kill serveur
+    authorizer = DummyAuthorizer()
+    authorizer.add_user("epsi", "client22", "./home/epsi", perm="elradfmwMT")
+    authorizer.add_anonymous("./home/epsi")
 
-server.close_all()
-print("rallumé")
-# Allumer serveur
+    handler.authorizer = authorizer
 
-server.serve_forever()
+    server = FTPServer(("127.0.0.1", 21), handler)
+    server.serve_forever()
+    print("toto")
+    # Kill serveur
+
+    server.close_all()
+    print("rallumé")
+    # Allumer serveur
+
+    server.serve_forever()
 
