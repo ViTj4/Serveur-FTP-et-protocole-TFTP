@@ -23,11 +23,18 @@ class MyFTPHandler(FTPHandler):
     def on_file_received(self, file):
         print(f"File {file} received")
 
+def lectureMDP():
+    with open('./secret/pwd.txt') as secret:
+        mdp = secret.readline()
+    return mdp
+
 if __name__ == "__main__":
     handler = MyFTPHandler
 
+    mdp = lectureMDP()
+
     authorizer = DummyAuthorizer()
-    authorizer.add_user("epsi", "client22", "./home/epsi", perm="elradfmwMT")
+    authorizer.add_user("epsi", mdp, "./home/epsi", perm="elradfmwMT")
 
     handler.authorizer = authorizer
 
