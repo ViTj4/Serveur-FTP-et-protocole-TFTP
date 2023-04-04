@@ -3,6 +3,7 @@ from pyftpdlib.servers import FTPServer
 from pyftpdlib.authorizers import DummyAuthorizer
 import tftpy
 from multiprocessing import Process
+import time
 
 class MyFTPHandler(FTPHandler):
 
@@ -29,25 +30,6 @@ def lectureMDP():
         mdp = secret.readline()
     return mdp
 
-class CustomTftpServer(tftpy.TftpServer):
-    def __init__(self, root, handler=None):
-        super().__init__(root, handler)
-        self.FTPserveur = Process(target=serverFTP)
-
-    def handle(self, request, handler):
-        self.before_connection(request)  # Exécutez la fonction avant la connexion
-        super().handle(request, handler)
-        self.after_connection(request)   # Exécutez la fonction après la connexion
-
-    def before_connection(self, request):
-        print("Avant la connexion:", request)
-
-    def after_connection(self, request):
-        self.FTPserveur.terminate()
-        self.FTPserveur.join()
-        self.FTPserveur = Process(target=serverFTP)
-        self.FTPserveur.start()
-
 
 def serverFTP():
     handler = MyFTPHandler
@@ -62,10 +44,24 @@ def serverFTP():
     server = FTPServer(("127.0.0.1", 21), handler)
     server.serve_forever()
 
-if __name__ == "__main__":
+def serverTFTP():
     tftp_root = "./secret"
-    server = CustomTftpServer(tftp_root)
-    server.FTPserveur.start()
+    server = tftpy.TftpServer(tftp_root)
 
     server.listen("127.0.0.1", 69)
 
+if __name__ == "__main__":
+    FTPserveur = Process(target=serverFTP)
+    TFTPserveur = Process(target=serverTFTP)   
+    true_mdp = lectureMDP()
+    FTPserveur.start()
+    TFTPserveur.start()
+    while True:
+        time.sleep(5)
+        mdp = lectureMDP()
+        if true_mdp != mdp:
+            FTPserveur.terminate()
+            FTPserveur.join()
+            FTPserveur = Process(target=serverFTP)
+            FTPserveur.start()
+            true_mdp = mdp
