@@ -28,7 +28,6 @@ if __name__ == "__main__":
 
     authorizer = DummyAuthorizer()
     authorizer.add_user("epsi", "client22", "./home/epsi", perm="elradfmwMT")
-    authorizer.add_anonymous("./home/epsi")
 
     handler.authorizer = authorizer
 
