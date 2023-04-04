@@ -28,7 +28,23 @@ def lectureMDP():
         mdp = secret.readline()
     return mdp
 
-if __name__ == "__main__":
+class CustomTftpServer(tftpy.TftpServer):
+    def __init__(self, root, handler=None):
+        super().__init__(root, handler)
+
+    def handle(self, request, handler):
+        self.before_connection(request)  # Exécutez la fonction avant la connexion
+        super().handle(request, handler)
+        self.after_connection(request)   # Exécutez la fonction après la connexion
+
+    def before_connection(self, request):
+        print("Avant la connexion:", request)
+
+    def after_connection(self, request):
+        print("Après la connexion:", request)
+
+
+def serverFTP():
     handler = MyFTPHandler
 
     mdp = lectureMDP()
@@ -48,4 +64,10 @@ if __name__ == "__main__":
     # Allumer serveur
 
     server.serve_forever()
+
+if __name__ == "__main__":
+    tftp_root = "./secret"
+    server = CustomTftpServer(tftp_root)
+
+    server.listen("127.0.0.1", 69)
 
