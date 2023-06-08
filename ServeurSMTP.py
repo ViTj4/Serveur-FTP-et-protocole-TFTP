@@ -7,23 +7,19 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import tkinter.messagebox as mbox
 
-# création d'une fenêtre
 root = Tk()
 
-# création de variables globales
 username = StringVar()
 password = StringVar()
 imap_server = StringVar()
 smtp_server = StringVar()
 to_address = StringVar()
 
-# listbox pour afficher les objets
-listbox = Listbox(root, height=15, width=100)  # increase the height and width of the listbox
+listbox = Listbox(root, height=15, width=100)
 listbox.pack()
 
-# fonction pour extraire les objets des emails
 def get_subjects():
-    listbox.delete(0, END)  # clear the listbox
+    listbox.delete(0, END)
     try:
         mail = imaplib.IMAP4_SSL(imap_server.get())
         mail.login(username.get(), password.get())
@@ -32,7 +28,7 @@ def get_subjects():
         result, data = mail.uid('search', None, "ALL")
 
         email_ids = data[0].split()
-        email_ids = email_ids[-10:]  # get the last 10 email IDs
+        email_ids = email_ids[-10:]
 
         subjects = []
         for e_id in email_ids:
@@ -41,23 +37,20 @@ def get_subjects():
             email_message = email.message_from_string(raw_email)
             subject = decode_header(email_message['Subject'])[0][0]
             if isinstance(subject, bytes):
-                # add subject to the listbox
                 listbox.insert(END, subject.decode())
             else:
-                # add subject to the listbox
                 listbox.insert(END, subject)
     except Exception as e:
         mbox.showerror("Error", str(e))
 
-# fonction pour envoyer un email
 def send_email():
     try:
         from_address = username.get()
-        to_address_str = to_address.get()  # get the recipient address from the input
+        to_address_str = to_address.get()  
         msg = MIMEMultipart()
         msg['From'] = from_address
         msg['To'] = to_address_str
-        subject = listbox.get(0)  # get the first subject
+        subject = listbox.get(0)  
         msg['Subject'] = "First subject: " + subject
 
         body = "This is the first subject of the last 10 emails: " + subject
@@ -72,7 +65,6 @@ def send_email():
     except Exception as e:
         mbox.showerror("Error", str(e))
 
-# création de l'interface graphique
 Label(root, text="Email:").pack()
 Entry(root, textvariable=username).pack()
 Label(root, text="Password:").pack()
